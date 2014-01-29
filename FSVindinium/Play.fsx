@@ -8,7 +8,7 @@ open FSVindinium
 
 // Put your API key here!
 // If you don't have one register at: http://vindinium.org
-let key = "dbhhqnzq" 
+let key = "" 
 
 // Helpers
 let rnd = new Random()
