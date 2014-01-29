@@ -36,15 +36,15 @@ let private makeWebRequest url queryVals =
     | 200, ResponseBody.Text txt -> Parser.Parse(txt)
     | rc, _ when rc >= 400 && rc < 500 -> failwithf "Http Response code: %i, You did something wrong (wrong secret key, trying to play when the game is already finished, too slow to send the move, …)" rc
     | 500, _ -> failwith "Something went wrong on the server side. How could it be possible? ;)"
-    | _ -> failwithf "Unexpected type in http response body."          
+    | _, ResponseBody.Binary _ -> failwith "Http response body was unexpectedly Binary." 
+    | code, _ -> failwithf "Unexpected Http Response Code: %i" code
 
 let private makeMove (key: string) (url: string) (move: Moves) =
     // key (required)
     //      The secret key you wrote down after registering at the register page
     // dir (required)
     //      Can be one of: 'Stay', 'North', 'South', 'East', 'West' 
-    let dir = match move with | Stay -> "stay" | North -> "north" | South -> "south" | East -> "east" | West -> "west"
-    let queryVals = ["key", key; "dir", dir]
+    let queryVals = ["key", key; "dir", move.ToString()]
     makeWebRequest url queryVals
 
 type VindiniumGame(key: string, state: Parser.Entity) = 
