@@ -1,6 +1,8 @@
-﻿
-#r @".\packages\FSharp.Data.2.0.0-alpha3\lib\net40\FSharp.Data.dll"
+﻿#r @".\packages\FSharp.Data.2.0.0-alpha3\lib\net40\FSharp.Data.dll"
+
 #r @".\bin\Release\FSVindinium.dll"
+// or, if you want to experiment with the source
+//#load "FSVindinium.fs"
 
 open System 
 open FSharp.Data

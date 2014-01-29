@@ -1,9 +1,5 @@
 ﻿module FSVindinium
 
-#if INTERACTIVE
-#r @".\packages\FSharp.Data.2.0.0-alpha3\lib\net40\FSharp.Data.dll"
-#endif
-
 open FSharp.Data
 open FSharp.Net
 
