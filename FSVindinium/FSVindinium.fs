@@ -1,8 +1,8 @@
 ﻿module FSVindinium
 
 #if INTERACTIVE
-#r @".\packages\FSharp.Data.1.1.10\lib\net40\FSharp.Data.dll"
-#r @".\packages\FSharp.Data.1.1.10\lib\net40\FSharp.Data.DesignTime.dll
+#r @".\packages\FSharp.Data.2.0.0-alpha3\lib\net40\FSharp.Data.dll"
+#r @".\packages\FSharp.Data.1.1.10\lib\net40\FSharp.Data.DesignTime.dll"
 #endif
 
 open FSharp.Data
@@ -30,25 +30,34 @@ with
         | s -> failwithf "Failed to convert %s, it is not a valid move" s
 
 let private makeWebRequest url queryVals =
-    let result = Http.Request(url = "http://vindinium.org/api/training", query = queryVals, meth = "POST")
-    printfn "Wat: %s" result
-    let parsed = Parser.Parse(result)          
-    parsed
+    let result = Http.Request(url = url, query = queryVals, meth = "POST")
+    
+    // 200: Everything went well, good job!
+    // 4xx (400, 404, …): You did something wrong (wrong secret key, trying to play when the game is already finished, too slow to send the move, …). 
+    //                    Be sure to check the response body to know what the exact error is.
+    // 500: Something went wrong on the server side. How could it be possible? ;)
+
+    match result.StatusCode, result.Body with
+    | 200, ResponseBody.Text txt -> Parser.Parse(txt)
+    | rc, _ when rc >= 400 && rc < 500 -> failwithf "Http Response code: %i, You did something wrong (wrong secret key, trying to play when the game is already finished, too slow to send the move, …)" rc
+    | 500, _ -> failwith "Something went wrong on the server side. How could it be possible? ;)"
+    | _ -> failwithf "Unexpected type in http response body."          
 
 let private makeMove (key: string) (url: string) (move: Moves) =
     // key (required)
     //      The secret key you wrote down after registering at the register page
     // dir (required)
     //      Can be one of: 'Stay', 'North', 'South', 'East', 'West' 
-
     let dir = match move with | Stay -> "stay" | North -> "north" | South -> "south" | East -> "east" | West -> "west"
     let queryVals = ["key", key; "dir", dir]
     makeWebRequest url queryVals
 
-type VindiniumGame(key: string, state: Parser.DomainTypes.Entity) = 
+type VindiniumGame(key: string, state: Parser.Entity) = 
     member t.StartingState = state
     member t.Move(move: Moves) = makeMove key state.PlayUrl move
 
+/// Turns - The number of turns you want to play. If you don't specify this parameter, 300 turns will be played.
+/// Map - The map id corresponding to the map you want to use. Possible values are: m1, m2, m3, m4, m5, m6. 
 let startTraining (key: string) (turns: int option) (map: string option) =
     // key (required)
     //      The secret key you wrote down after registering at the register page

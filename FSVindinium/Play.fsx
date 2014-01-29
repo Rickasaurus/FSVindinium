@@ -1,5 +1,5 @@
 ﻿
-#r @".\packages\FSharp.Data.1.1.10\lib\net40\FSharp.Data.dll"
+#r @".\packages\FSharp.Data.2.0.0-alpha3\lib\net40\FSharp.Data.dll"
 #r @".\bin\Release\FSVindinium.dll"
 
 open System 
@@ -24,7 +24,7 @@ let getRandomMove () =
 
 // Define AI
 let startAI (game: VindiniumGame) =
-    let rec aiLoop (state: Parser.DomainTypes.Entity) = 
+    let rec aiLoop (state: Parser.Entity) = 
         // If finished return the final game state
         if state.Game.Finished then 
             printfn "Finished"
