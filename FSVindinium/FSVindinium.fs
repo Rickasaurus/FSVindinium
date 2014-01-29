@@ -2,7 +2,6 @@
 
 #if INTERACTIVE
 #r @".\packages\FSharp.Data.2.0.0-alpha3\lib\net40\FSharp.Data.dll"
-#r @".\packages\FSharp.Data.1.1.10\lib\net40\FSharp.Data.DesignTime.dll"
 #endif
 
 open FSharp.Data
